@@ -1,6 +1,6 @@
 package com.polinasmogi.isskicker.api
 
-import com.polinasmogi.isskicker.api.models.Player
+import com.polinasmogi.isskicker.api.models.MembersData
 import retrofit2.Call
 import retrofit2.Response
 
@@ -8,17 +8,17 @@ class Requests {
 
     fun getMembers(
         apiClient: Services,
-        callback: (ArrayList<Player>) -> Unit,
+        callback: (MembersData) -> Unit,
         errorHandler: ((errorBody: String) -> Unit)?) {
 
-        apiClient.getMembers().enqueue(object: retrofit2.Callback<ArrayList<Player>> {
+        apiClient.getMembers().enqueue(object: retrofit2.Callback<MembersData> {
             override fun onResponse(
-                call: Call<ArrayList<Player>>,
-                response: Response<ArrayList<Player>>) {
+                call: Call<MembersData>,
+                response: Response<MembersData>) {
                     response.body()?.let { callback(it) }
             }
 
-            override fun onFailure(call: Call<ArrayList<Player>>, t: Throwable) {
+            override fun onFailure(call: Call<MembersData>, t: Throwable) {
 
             }
 

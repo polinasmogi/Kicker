@@ -25,7 +25,8 @@ class SelectPlayersPresenter: SelectPlayersContract.Presenter {
         requests.getMembers(
             apiClient,
             callback = {
-                view.showPlayers(it)
+                val players = it.data
+                view.showPlayers(players)
             },
             errorHandler = {}
         )

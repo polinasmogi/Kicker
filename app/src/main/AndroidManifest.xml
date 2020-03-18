@@ -13,6 +13,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.selectPlayers.SelectPlayersActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

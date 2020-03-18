@@ -10,9 +10,7 @@ import com.polinasmogi.isskicker.api.RetrofitClientInstance
 import com.polinasmogi.isskicker.api.Services
 import com.polinasmogi.isskicker.api.models.Player
 import com.polinasmogi.isskicker.interfaces.SelectPlayerExecutor
-import com.polinasmogi.isskicker.ui.adapters.AllPlayersAdapter
-import com.polinasmogi.isskicker.ui.adapters.BlueTeamAdapter
-import com.polinasmogi.isskicker.ui.adapters.RedTeamAdapter
+import com.polinasmogi.isskicker.ui.adapters.PlayersAdapter
 import kotlinx.android.synthetic.main.select_players_layout.*
 
 class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
@@ -23,12 +21,12 @@ class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
     lateinit var presenter: SelectPlayersPresenter
     val requests = Requests()
 
-    val players : ArrayList<Player> = ArrayList()
+    var players : ArrayList<Player> = ArrayList()
     val blueTeam : ArrayList<Player> = ArrayList()
     val redTeam : ArrayList<Player> = ArrayList()
-    lateinit var allPlayersAdapter: AllPlayersAdapter
-    lateinit var blueTeamAdapter: BlueTeamAdapter
-    lateinit var redTeamAdapter: RedTeamAdapter
+    lateinit var playersAdapter: PlayersAdapter
+    lateinit var blueTeamAdapter: PlayersAdapter
+    lateinit var redTeamAdapter: PlayersAdapter
 
     val blue = 1
     val red = 2
@@ -51,16 +49,18 @@ class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
     }
 
     override fun showPlayers(players: ArrayList<Player>) {
+        this.players = players
+
         all_players_recycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        allPlayersAdapter = AllPlayersAdapter(players, this, Executor())
-        all_players_recycler.adapter = allPlayersAdapter
+        playersAdapter = PlayersAdapter(players, this, Executor())
+        all_players_recycler.adapter = playersAdapter
     }
 
     private fun initBlueRecycler() {
         blue_team_recycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        blueTeamAdapter = BlueTeamAdapter(blueTeam, this)
+        blueTeamAdapter = PlayersAdapter(blueTeam, this, Executor())
         blue_team_recycler.adapter = blueTeamAdapter
 
         blue_team_layout.setOnClickListener {
@@ -72,7 +72,7 @@ class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
     private fun initRedRecycler() {
         red_team_recycler.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        redTeamAdapter = RedTeamAdapter(redTeam, this)
+        redTeamAdapter = PlayersAdapter(redTeam, this, Executor())
         red_team_recycler.adapter = redTeamAdapter
 
         red_team_layout.setOnClickListener {
@@ -83,7 +83,7 @@ class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
 
     inner class Executor : SelectPlayerExecutor {
         override fun execute(v: View, position: Int) {
-            val selectedPlayer = allPlayersAdapter.selectPlayer(position)
+            val selectedPlayer = playersAdapter.selectPlayer(position)
 
             if (selectedTeam == blue) {
                 if (blueTeam.size < 2) {
@@ -98,7 +98,7 @@ class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
             }
 
             players.remove(selectedPlayer)
-            allPlayersAdapter.updatePlayersList(players)
+            playersAdapter.updatePlayersList(players)
 
         }
     }
