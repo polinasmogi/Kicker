@@ -5,21 +5,24 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.polinasmogi.isskicker.R
-import com.polinasmogi.isskicker.api.Requests
-import com.polinasmogi.isskicker.api.RetrofitClientInstance
 import com.polinasmogi.isskicker.api.Services
 import com.polinasmogi.isskicker.api.models.Player
+import com.polinasmogi.isskicker.di.ActivityModule
+import com.polinasmogi.isskicker.di.DaggerActivityComponent
+import com.polinasmogi.isskicker.di.DaggerServicesComponent
+import com.polinasmogi.isskicker.di.ServicesModule
 import com.polinasmogi.isskicker.interfaces.SelectPlayerExecutor
 import com.polinasmogi.isskicker.ui.adapters.PlayersAdapter
 import kotlinx.android.synthetic.main.select_players_layout.*
+import com.polinasmogi.isskicker.api.Requests as Requests
 
 class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
 
     val TAG = "SelectPlayersActivity"
 
-    lateinit var apiClient: Services
-    lateinit var presenter: SelectPlayersPresenter
-    val requests = Requests()
+    private lateinit var apiClient: Services
+    private lateinit var presenter: SelectPlayersPresenter
+    private lateinit var requests: Requests
 
     var players : ArrayList<Player> = ArrayList()
     val blueTeam : ArrayList<Player> = ArrayList()
@@ -28,8 +31,8 @@ class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
     lateinit var blueTeamAdapter: PlayersAdapter
     lateinit var redTeamAdapter: PlayersAdapter
 
-    val blue = 1
-    val red = 2
+    private val blue = 1
+    private val red = 2
 
     var selectedTeam = blue
 
@@ -37,15 +40,28 @@ class SelectPlayersActivity : AppCompatActivity(), SelectPlayersContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.select_players_layout)
 
-        apiClient = RetrofitClientInstance().getRetrofitInstance().create(Services::class.java)
-        presenter = SelectPlayersPresenter()
-        presenter.onAttach(this, apiClient, requests)
+        injectDependency()
 
+        presenter.onAttach(this, apiClient, requests)
         presenter.getMembers()
 
         initBlueRecycler()
         initRedRecycler()
 
+    }
+
+    private fun injectDependency() {
+        val servicesComponent = DaggerServicesComponent.builder()
+            .servicesModule(ServicesModule())
+            .build()
+
+        val activityComponent = DaggerActivityComponent.builder()
+            .activityModule(ActivityModule(this))
+            .build()
+
+        apiClient = servicesComponent.getServices()
+        requests = servicesComponent.getRequests()
+        presenter = activityComponent.getSelectPlayersPresenter()
     }
 
     override fun showPlayers(players: ArrayList<Player>) {

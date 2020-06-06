@@ -14,10 +14,3 @@ data class Player (
     val photo : Photos
 
 )
-
-data class Photos (
-
-    @SerializedName("small")
-    val small : String
-
-)
